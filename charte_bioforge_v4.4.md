@@ -1,4 +1,4 @@
-# Charte d'Ingénierie BioForge (v4.3) - Norme de Production
+# Charte d'Ingénierie BioForge (v4.4) - Norme de Production
 Ce document définit les règles strictes, binaires et scientifiquement rigoureuses pour le développement de BioForge. Toute génération de code par une IA doit s'y conformer. Le non-respect de ces règles invalide la génération.
 ## 1. Environnement, Stack et Workflow
 - **Python** : 3.12+ minimum (avec conscience de la compatibilité free-threaded 3.13+). Utiliser les fonctionnalités natives de typage (`type Alias = ...`, `def func[T](x: T)`).
@@ -63,16 +63,12 @@ rust-version = "1.70.0"
 
 ## 4. Gestion de la Mémoire et des Données
 - Données Tabulaires : `polars` en Rust est **AUTORISÉ** pour les opérations internes sur des données tabulaires, mais **INTERDIT** comme type exposé en Python. Les données DOIVENT être converties en types natifs (ex: `Vec<Record>`) avant de traverser la frontière Python.
-- **Encodage des Séquences (3-bit par défaut pour le MVP)** :
-    - **Règle** : Utiliser l’implémentation **2 bases par octet (6 bits utilisés, 2 bits perdus)** pour le MVP.
-    - *Justification* : Simplicité (pas de gestion de chevauchement), performance (accès O(1) trivial) et maintenabilité. La version compacte (sans gaspillage) est réservée à une optimisation future uniquement si des benchmarks montrent un gain mémoire >20% sans perte de performance.
-    - *Implémentation MVP obligatoire* :
-        ```rust
-        let octet_idx = i / 2;
-        let shift = 4 * (i % 2); // 0 ou 4
-        let bits = (data[octet_idx] >> shift) & 0b111;
-        ```
-    - *Règle de documentation* : Tout module doit documenter la version utilisée (ex: `// Encodage: 2 bases/octet`).
+- **Encodage des Séquences (Modèle bio-seq)** :
+    - La représentation des séquences suit le modèle de la crate `bio-seq` (MIT). Le stockage est basé sur le bit-packing, avec des codecs distincts selon la sémantique biologique :
+      - DNA / RNA : 2 bits/symbole (4 bases).
+      - IUPAC : 4 bits/symbole (16 codes d'ambiguïté, conservation totale de l'information).
+      - Amino : 6 bits/symbole (25+ acides aminés et caractères spéciaux).
+    - **Règle d'abstraction** : Le bit-packing est un détail d'implémentation caché derrière le trait `Codec`. L'API publique (Rust et Python) ne doit jamais exposer directement les octets bruts, mais toujours des symboles biologiques. Les vues (`SeqSlice`) doivent permettre des opérations zero-copy en interne.
 - **Encapsulation Python** : Les vues mémoire provenant de Rust DOIVENT être encapsulées dans des classes Python sûres (ex: `Sequence3Bit`) exposant une API propre (`__getitem__`, `__len__`). L'accès direct à la mémoire brute est interdit.
 
 ## 5. Gestion des Dépendances
