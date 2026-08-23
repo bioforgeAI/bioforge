@@ -104,7 +104,7 @@ impl Sequence3Bit {
     ///
     /// # Arguments
     /// * `seq`: Chaîne de caractères représentant l'ADN.
-    ///   **Canonicalisation** : La séquence est mise en majuscules. 
+    ///   **Canonicalisation** : La séquence est mise en majuscules.
     ///   Les bases A, C, G, T, N, R, Y, S sont conservées.
     ///   Les autres bases IUPAC (W, K, M, B, D, H, V) sont dégradées en 'N' (valeur 4).
     ///   Tout autre caractère lève une `SequenceError::InvalidCharacter`.
@@ -115,7 +115,7 @@ impl Sequence3Bit {
     /// # Errors
     /// * `SequenceError::InvalidCharacter`: Si `seq` contient un caractère invalide ou non-ASCII.
     #[new]
-    #[pyo3(signature = (seq, /))]/
+    #[pyo3(signature = (seq, /))]
     pub fn new(seq: &str) -> Result<Self, SequenceError> {
         let length = seq.len();
         let capacity = (length + 1) / 2;
@@ -195,13 +195,13 @@ impl Sequence3Bit {
         s
     }
 
-        /// Retourne une copie du buffer interne encodé en 3-bit.
+    /// Retourne une copie du buffer interne encodé en 3-bit.
     ///
     /// # Returns
     /// * `Py<PyBytes>`: Buffer brut (garanti d'être un `bytes` en Python).
     #[pyo3(name = "to_bytes")]
     pub fn get_bytes(&self, py: Python) -> PyResult<Py<PyBytes>> {
-        Ok(PyBytes::new_bound(py, &self.data)?.into())
+        Ok(PyBytes::new_bound(py, &self.data).unbind())
     }
 
     /// Équivalent à `to_string()`, pour la compatibilité avec `str(seq)`.

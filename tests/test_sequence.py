@@ -26,4 +26,5 @@ class TestSequence3Bit:
 
     def test_to_bytes(self):
         seq = Sequence3Bit("ATGC")
-        assert seq.to_bytes == b"\x03\x11"  # A=000, T=011 → 0x03; G=010, C=001 → 0x11
+        # ✅ Correction : to_bytes est maintenant une méthode, il faut l'appeler avec ()
+        assert seq.to_bytes() == b"\x03\x11"  # A=000, T=011 → 0x03; G=010, C=001 → 0x11

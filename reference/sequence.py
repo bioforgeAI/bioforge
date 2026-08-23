@@ -6,7 +6,7 @@ Usage autorisé : Uniquement dans les tests différentiels (tests/test_sequence_
 """
 
 # Dictionnaire de canonicalisation explicite (conforme à la logique Rust MVP)
-_CANONICAL_MAP = {
+_CANONICAL_MAP: dict[str, str] = {
     "A": "A",
     "C": "C",
     "G": "G",
@@ -28,7 +28,7 @@ _CANONICAL_MAP = {
 
 def canonicalize(seq: str) -> str:
     """Normalise la séquence : majuscules + dégradation des bases ambiguës complexes en 'N'."""
-    result = []
+    result: list[str] = []
     for char in seq:
         upper_char = char.upper()
         if upper_char not in _CANONICAL_MAP:
@@ -40,17 +40,14 @@ def canonicalize(seq: str) -> str:
 class ReferenceSequence:
     """Oracle de comportement naïf pour valider l'implémentation Rust."""
 
-    def __init__(self, seq: str):
+    def __init__(self, seq: str) -> None:
         # On stocke en liste de strings pour un accès O(1) naïf et transparent
-        self._symbols = list(canonicalize(seq))
+        self._symbols: list[str] = list(canonicalize(seq))
 
     def __len__(self) -> int:
         return len(self._symbols)
 
     def __getitem__(self, index: int) -> str:
-        if not isinstance(index, int):
-            raise TypeError("Index must be an integer")
-
         idx = index
         if idx < 0:
             idx += len(self._symbols)
