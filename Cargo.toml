@@ -1,0 +1,15 @@
+[package]
+name = "bioforge"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70.0"
+
+[lib]
+name = "bioforge"
+crate-type = ["cdylib"] # Obligatoire pour les modules Python
+
+[dependencies]
+pyo3 = { version = "0.21", features = ["extension-module"] }
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }           # Ajouté (charte v4.2)
+flate2 = "1.0"                                               # Ajouté (charte v4.2)

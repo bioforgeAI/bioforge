@@ -1,0 +1,30 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install -e ".[dev]"
+          cargo install cargo-audit
+      - name: Lint Rust
+        run: |
+          cargo fmt --check
+          cargo clippy -- -D warnings
+      - name: Lint Python
+        run: |
+          ruff check
+          ruff format --check
+      - name: Type check
+        run: pyright
+      - name: Test Python
+        run: pytest
+      - name: Test Rust
+        run: cargo test
