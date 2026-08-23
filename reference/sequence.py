@@ -1,58 +1,70 @@
 # reference/sequence.py
 """
-Implémentation de référence naïve pour l'encodage 3-bit (2 bases/octet).
+Implémentation de référence naïve et transparente pour la séquence ADN.
 CE FICHIER NE DOIT JAMAIS ÊTRE IMPORTÉ DANS src/ OU bioforge/.
-Usage autorisé : Uniquement dans les tests de validation (ex: tests/test_sequence_reference.py).
+Usage autorisé : Uniquement dans les tests différentiels (tests/test_sequence_differential.py).
 """
 
-# Mapping conforme à la logique Rust du MVP (A=0, C=1, G=2, T=3, N=4, R=5, Y=6, S=7)
-# Les autres bases IUPAC (W, K, M, B, D, H, V) sont dégradées en N (4) pour le MVP.
-ENCODE_MAP = {
-    "A": 0,
-    "a": 0,
-    "C": 1,
-    "c": 1,
-    "G": 2,
-    "g": 2,
-    "T": 3,
-    "t": 3,
-    "N": 4,
-    "n": 4,
-    "R": 5,
-    "r": 5,
-    "Y": 6,
-    "y": 6,
-    "S": 7,
-    "s": 7,
-    "W": 4,
-    "w": 4,
-    "K": 4,
-    "k": 4,
-    "M": 4,
-    "m": 4,
-    "B": 4,
-    "b": 4,
-    "D": 4,
-    "d": 4,
-    "H": 4,
-    "h": 4,
-    "V": 4,
-    "v": 4,
+# Dictionnaire de canonicalisation explicite (conforme à la logique Rust MVP)
+_CANONICAL_MAP = {
+    "A": "A",
+    "C": "C",
+    "G": "G",
+    "T": "T",
+    "N": "N",
+    "R": "R",
+    "Y": "Y",
+    "S": "S",
+    # Dégradation des bases IUPAC complexes en 'N' pour le MVP
+    "W": "N",
+    "K": "N",
+    "M": "N",
+    "B": "N",
+    "D": "N",
+    "H": "N",
+    "V": "N",
 }
 
-DECODE_MAP = ["A", "C", "G", "T", "N", "R", "Y", "S"]
 
-
-def encode_sequence_reference(seq: str) -> list[int]:
-    """Encode une séquence en liste d'entiers (0-7) pour validation."""
+def canonicalize(seq: str) -> str:
+    """Normalise la séquence : majuscules + dégradation des bases ambiguës complexes en 'N'."""
     result = []
     for char in seq:
-        if char not in ENCODE_MAP:
-            raise ValueError(f"Invalid character in sequence: {char}")
-        result.append(ENCODE_MAP[char])
-    return result
+        upper_char = char.upper()
+        if upper_char not in _CANONICAL_MAP:
+            raise ValueError(f"Invalid character in sequence: '{char}'")
+        result.append(_CANONICAL_MAP[upper_char])
+    return "".join(result)
 
 
-def decode_sequence_reference(encoded: list[int]) -> str:
-    """Décode une liste d'entiers (0-7) en chaîne de caractères."""
-    return "".join(DECODE_MAP[val] for val in encoded)
+class ReferenceSequence:
+    """Oracle de comportement naïf pour valider l'implémentation Rust."""
+
+    def __init__(self, seq: str):
+        # On stocke en liste de strings pour un accès O(1) naïf et transparent
+        self._symbols = list(canonicalize(seq))
+
+    def __len__(self) -> int:
+        return len(self._symbols)
+
+    def __getitem__(self, index: int) -> str:
+        if not isinstance(index, int):
+            raise TypeError("Index must be an integer")
+
+        idx = index
+        if idx < 0:
+            idx += len(self._symbols)
+
+        if idx < 0 or idx >= len(self._symbols):
+            raise IndexError(
+                f"Index out of bounds: {index} (length: {len(self._symbols)})"
+            )
+
+        return self._symbols[idx]
+
+    def to_string(self) -> str:
+        return "".join(self._symbols)
+
+    def to_bytes(self) -> bytes:
+        """Retourne une représentation bytes naïve (pour comparaison conceptuelle, pas bit-à-bit)."""
+        return self.to_string().encode("ascii")

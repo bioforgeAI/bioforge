@@ -3,53 +3,61 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  lint-and-test:
+  validation:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install Python dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
 
-      - name: Lint & Type Check Python
+      - name: Check for forbidden 'reference' imports in production code
+        run: |
+          if grep -rn "from reference" bioforge/ src/ --include="*.py" --include="*.rs" 2>/dev/null; then
+            echo "::error::Forbidden import from 'reference' detected in production code!"
+            exit 1
+          fi
+          if grep -rn "import reference" bioforge/ src/ --include="*.py" --include="*.rs" 2>/dev/null; then
+            echo "::error::Forbidden import from 'reference' detected in production code!"
+            exit 1
+          fi
+          echo "✅ No forbidden reference imports found."
+
+      - name: Check for NotImplementedError in production code
+        run: |
+          if grep -rn "NotImplementedError" bioforge/ src/ --include="*.py" --include="*.rs" 2>/dev/null | grep -v "test" | grep -v "reference/"; then
+            echo "::error::NotImplementedError found in production code!"
+            exit 1
+          fi
+          echo "✅ No forbidden NotImplementedError found."
+
+      - name: Lint & Type Check
         run: |
           ruff check
           ruff format --check
           pyright
 
-      - name: Check for NotImplementedError in production code
-        run: |
-          # Échoue si un NotImplementedError est trouvé dans le code de production (hors tests et reference)
-          if grep -rn "NotImplementedError" bioforge/ src/ --include="*.py" --include="*.rs" | grep -v "test" | grep -v "reference/"; then
-            echo "::error::NotImplementedError found in production code! This is forbidden by BioForge charter v4.2."
-            exit 1
-          fi
-          echo "✅ No forbidden NotImplementedError found."
+      - name: Test Python (Unit & Differential)
+        run: pytest tests/ -v
 
-      - name: Test Python
-        run: pytest -v
-
-      - name: Lint Rust
+      - name: Lint & Test Rust
         run: |
           cargo fmt --check
           cargo clippy -- -D warnings
+          cargo test
 
-      - name: Test Rust
-        run: cargo test
-
-  memory-check:
+  memory-safety:
     runs-on: ubuntu-latest
     name: Memory Safety Check (Valgrind)
+    # Ce job est séparé car Valgrind peut être lent et générer du bruit avec l'interpréteur Python
     steps:
       - uses: actions/checkout@v4
       - name: Install Valgrind
         run: sudo apt-get update && sudo apt-get install -y valgrind
       - name: Run Valgrind on Rust tests
-        # Vérifie les fuites mémoire et les accès invalides dans le code Rust
         run: valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1 cargo test

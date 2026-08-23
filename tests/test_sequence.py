@@ -24,6 +24,6 @@ class TestSequence3Bit:
         with pytest.raises(IndexError):
             _ = seq[10]
 
-    def test_as_bytes(self):
+    def test_to_bytes(self):
         seq = Sequence3Bit("ATGC")
-        assert seq.as_bytes == b"\x03\x11"  # A=000, T=011 → 0x03; G=010, C=001 → 0x11
+        assert seq.to_bytes == b"\x03\x11"  # A=000, T=011 → 0x03; G=010, C=001 → 0x11
