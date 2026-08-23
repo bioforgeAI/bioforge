@@ -2,7 +2,7 @@
 Ce document définit les règles strictes, binaires et scientifiquement rigoureuses pour le développement de BioForge. Toute génération de code par une IA doit s'y conformer. Le non-respect de ces règles invalide la génération.
 ## 1. Environnement, Stack et Workflow
 - **Python** : 3.12+ minimum (avec conscience de la compatibilité free-threaded 3.13+). Utiliser les fonctionnalités natives de typage (`type Alias = ...`, `def func[T](x: T)`).
-- **Rust** : Édition 2021, avec un MSRV (Minimum Supported Rust Version) de 1.70.0 (compatible avec PyO3 0.20+) explicitement défini dans `Cargo.toml` :
+- **Rust** : Édition 2021, avec un MSRV (Minimum Supported Rust Version) de 1.70.0 (compatible avec PyO3 0.21+) explicitement défini dans `Cargo.toml` :
 ```toml
 [package]
 edition = "2021"
