@@ -104,7 +104,7 @@ impl Sequence3Bit {
     ///
     /// # Arguments
     /// * `seq`: Chaîne de caractères représentant l'ADN.
-    ///   **Bases valides** : A, C, G, T, N, R, Y, S, W, K, M, B, D, H, V (majuscules/minuscules).
+    ///   **Bases valides** : A, C, G, T, N, R
     ///   La chaîne est **convertie en majuscules** avant encodage.
     ///
     /// # Returns

@@ -1,0 +1,5 @@
+# benchmarks/requirements.txt
+# Version figée pour garantir la reproductibilité des benchmarks différentiels.
+# Mise à jour uniquement après validation manuelle des résultats.
+biopython==1.84.0
+pytest-benchmark>=4.0.0

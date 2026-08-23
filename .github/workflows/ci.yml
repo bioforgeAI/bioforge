@@ -3,28 +3,53 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  test:
+  lint-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install dependencies
+
+      - name: Install Python dependencies
         run: |
+          python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
-          cargo install cargo-audit
+
+      - name: Lint & Type Check Python
+        run: |
+          ruff check
+          ruff format --check
+          pyright
+
+      - name: Check for NotImplementedError in production code
+        run: |
+          # Échoue si un NotImplementedError est trouvé dans le code de production (hors tests et reference)
+          if grep -rn "NotImplementedError" bioforge/ src/ --include="*.py" --include="*.rs" | grep -v "test" | grep -v "reference/"; then
+            echo "::error::NotImplementedError found in production code! This is forbidden by BioForge charter v4.2."
+            exit 1
+          fi
+          echo "✅ No forbidden NotImplementedError found."
+
+      - name: Test Python
+        run: pytest -v
+
       - name: Lint Rust
         run: |
           cargo fmt --check
           cargo clippy -- -D warnings
-      - name: Lint Python
-        run: |
-          ruff check
-          ruff format --check
-      - name: Type check
-        run: pyright
-      - name: Test Python
-        run: pytest
+
       - name: Test Rust
         run: cargo test
+
+  memory-check:
+    runs-on: ubuntu-latest
+    name: Memory Safety Check (Valgrind)
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Valgrind
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+      - name: Run Valgrind on Rust tests
+        # Vérifie les fuites mémoire et les accès invalides dans le code Rust
+        run: valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1 cargo test
