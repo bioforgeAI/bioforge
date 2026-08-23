@@ -12,6 +12,11 @@ rust-version = "1.70.0"
 - **Représentation Canonique des Types** : Un type de donnée ne doit être défini qu'une seule fois. Son emplacement est dicté par des critères quantitatifs :
     - *Hot-path data* (>100 000 instances ou boucles critiques, ex: `Sequence`, `FastqRecord`) → Struct Rust native (`#[pyclass]`) ou `@dataclass(frozen=True, slots=True)` en Python.
     - *Configuration / Frontières externes* (<10 000 instances) → `pydantic` en Python.
+- **Règle d'Inspiration Architecturale Externe** :
+    - BioForge ne doit pas réinventer des concepts fondamentaux déjà résolus de manière optimale dans l'écosystème Rust.
+    - La crate `bio-seq` (https://crates.io/crates/bio-seq) est désignée comme la référence architecturale absolue pour la représentation des séquences (modèle `Seq<Codec>`, encodage 2-bit pour l'ADN pur, 4-bit pour l'IUPAC, 6-bit pour les protéines, et type `Kmer`). Étant sous licence MIT, son code peut-être repris et modifié pour notre usage.
+    - Décision : BioForge réimplémentera ce pattern générique de manière minimaliste et sur-mesure pour une intégration PyO3 optimale, plutôt que de dépendre directement de la crate (pour éviter les conflits de types et garder le contrôle de l'API Python).
+    - Toute nouvelle représentation de séquence doit être justifiée par rapport à ce modèle de référence.
 
 ## 2. Qualité du Code Python (Frontend)
 - **Typage Strict** : 100% du code doit passer `pyright` en mode `strict`. `# type: ignore[...]` est autorisé **UNIQUEMENT** pour les dépendances externes non typées ou bugs avérés, avec un commentaire explicatif obligatoire.
