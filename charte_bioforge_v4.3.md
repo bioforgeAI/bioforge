@@ -1,4 +1,4 @@
-# Charte d'Ingénierie BioForge (v4.2) - Norme de Production
+# Charte d'Ingénierie BioForge (v4.3) - Norme de Production
 Ce document définit les règles strictes, binaires et scientifiquement rigoureuses pour le développement de BioForge. Toute génération de code par une IA doit s'y conformer. Le non-respect de ces règles invalide la génération.
 ## 1. Environnement, Stack et Workflow
 - **Python** : 3.12+ minimum (avec conscience de la compatibilité free-threaded 3.13+). Utiliser les fonctionnalités natives de typage (`type Alias = ...`, `def func[T](x: T)`).
