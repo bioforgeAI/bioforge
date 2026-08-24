@@ -32,11 +32,12 @@ impl<C: Codec> Seq<C> {
         let len = symbols.len();
         let bits_per_symbol = C::BITS_PER_SYMBOL;
 
-        // Sécurité : garantit que le bit-packing fonctionne avec des opérations u8/u16
-        assert!(
-            bits_per_symbol <= 8,
-            "BITS_PER_SYMBOL must be <= 8 for u8 packing"
-        );
+        // Invariant du codec vérifié sans paniquer (charte §3).
+        if bits_per_symbol == 0 || bits_per_symbol > 8 {
+            return Err(SeqError::UnsupportedBitsPerSymbol {
+                bits: bits_per_symbol,
+            });
+        }
 
         let capacity = (len * bits_per_symbol + 7) / 8;
         let mut data = vec![0; capacity];
@@ -96,10 +97,6 @@ impl<C: Codec> Seq<C> {
             })?);
         }
         Self::new(symbols)
-    }
-
-    pub fn to_bytes(&self) -> Vec<u8> {
-        self.data.clone()
     }
     pub fn len(&self) -> usize {
         self.len

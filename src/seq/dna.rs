@@ -2,7 +2,7 @@ use super::codec::{Dna, DnaBase};
 use super::core::Seq;
 use super::error::SeqError;
 use pyo3::prelude::*;
-use pyo3::types::{PyBytes, PySlice};
+use pyo3::types::PySlice;
 
 #[pyclass(module = "bioforge.seq", name = "DnaSequence")]
 pub struct PyDnaSequence {
@@ -31,16 +31,18 @@ impl PyDnaSequence {
         self.inner.len()
     }
 
-    /// Retourne la séquence sous forme de chaîne de caractères ASCII.
+    /// Retourne la séquence sous forme de chaîne de caractères.
+    ///
+    /// # Returns
+    /// * `String` : la séquence décodée en majuscules.
     pub fn __str__(&self) -> String {
-        let mut bytes = Vec::with_capacity(self.inner.len());
+        let mut s = String::with_capacity(self.inner.len());
         for i in 0..self.inner.len() {
             if let Some(symbol) = self.inner.get(i) {
-                bytes.push(symbol.to_ascii_u8());
+                s.push(symbol.to_char());
             }
         }
-        // Safe car nous ne poussons que des octets ASCII valides (A, C, G, T)
-        unsafe { String::from_utf8_unchecked(bytes) }
+        s
     }
 
     /// Récupère un symbole ou une slice de la séquence.
@@ -112,12 +114,5 @@ impl PyDnaSequence {
         Ok(PyDnaSequence {
             inner: self.inner.reverse_complement()?,
         })
-    }
-
-    /// Retourne une copie du buffer interne encodé sous forme d'objet `bytes` Python.
-    #[getter]
-    pub fn to_bytes(&self, py: Python) -> PyObject {
-        // PyBytes::new_bound crée un objet bytes Python à partir du Vec<u8>
-        PyBytes::new_bound(py, &self.inner.to_bytes()).into()
     }
 }

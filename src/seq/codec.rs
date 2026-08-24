@@ -54,13 +54,20 @@ impl DnaBase {
         }
     }
 
-    /// Convertit en octet ASCII pour une construction rapide de String.
-    pub fn to_ascii_u8(self) -> u8 {
+    /// Convertit une `DnaBase` en son caractère ASCII.
+    ///
+    /// # Arguments
+    /// * `self` : la base à convertir.
+    ///
+    /// # Returns
+    /// * `char` : le caractère correspondant ('A', 'C', 'G' ou 'T').
+    #[must_use]
+    pub fn to_char(self) -> char {
         match self {
-            DnaBase::A => b'A',
-            DnaBase::C => b'C',
-            DnaBase::G => b'G',
-            DnaBase::T => b'T',
+            DnaBase::A => 'A',
+            DnaBase::C => 'C',
+            DnaBase::G => 'G',
+            DnaBase::T => 'T',
         }
     }
 }

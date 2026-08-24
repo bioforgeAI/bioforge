@@ -1,17 +1,24 @@
 use pyo3::{
-    exceptions::{PyIndexError, PyValueError},
+    exceptions::{PyIndexError, PyOverflowError, PyValueError},
     PyErr,
 };
 use thiserror::Error;
 
 /// Erreurs liées à la manipulation des séquences biologiques.
 ///
+/// # Description
+/// Cette enum centralise toutes les erreurs du module `seq`. Chaque variante
+/// est mappée de manière exhaustive vers une exception Python via
+/// `From<SeqError> for PyErr`, conformément à la charte v4.4 §3.
+///
 /// # Variantes
-/// - `InvalidSymbol`: Symbole invalide pour le codec utilisé à une position donnée.
-/// - `InvalidKmerLength`: Longueur de k-mer demandée invalide (doit être > 0).
-/// - `SliceOutOfBounds`: Index de slice hors des limites de la séquence.
-/// - `KmerTooLarge`: Le k-mer est trop grand pour tenir dans le stockage interne (u128).
-/// - `NoComplementForCodec`: Le codec ne supporte pas l'opération de complément (ex: protéines).
+/// - `InvalidSymbol` : symbole non reconnu par le codec à une position donnée.
+/// - `InvalidKmerLength` : longueur de k-mer invalide (doit être > 0).
+/// - `SliceOutOfBounds` : index hors des limites de la séquence.
+/// - `KmerTooLarge` : k-mer dépassant la capacité du stockage interne (`u128`).
+/// - `NoComplementForCodec` : le codec ne supporte pas le complément (ex. protéines).
+/// - `UnsupportedBitsPerSymbol` : le codec déclare un nombre de bits/symbole non supporté.
+/// - `SequenceTooLong` : la séquence dépasse la capacité de représentation interne.
 #[derive(Error, Debug)]
 pub enum SeqError {
     #[error("Invalid symbol '{symbol}' at position {pos} for this codec")]
@@ -28,34 +35,50 @@ pub enum SeqError {
 
     #[error("Complement operation is not supported for codec {codec}")]
     NoComplementForCodec { codec: &'static str },
+
+    #[error("Unsupported bits per symbol: {bits} (must be between 1 and 8)")]
+    UnsupportedBitsPerSymbol { bits: usize },
+
+    #[error("Sequence too large to encode: {len} symbols overflow the internal representation")]
+    SequenceTooLong { len: usize },
 }
 
 /// Mapping exhaustif des erreurs Rust vers les exceptions Python.
 ///
-/// # Variantes
-/// - `InvalidSymbol` → `PyValueError`
-/// - `SliceOutOfBounds` → `PyIndexError`
-/// - `InvalidKmerLength`, `KmerTooLarge`, `NoComplementForCodec` → `PyValueError`
+/// # Description
+/// Convertit chaque variante de `SeqError` vers l'exception Python la plus
+/// sémantique. Le `match` est exhaustif : `clippy` échouera si une variante
+/// est oubliée.
+///
+/// # Arguments
+/// * `err` : l'erreur Rust à convertir.
+///
+/// # Returns
+/// * `PyErr` : l'exception Python correspondante.
 impl From<SeqError> for PyErr {
     fn from(err: SeqError) -> Self {
         match err {
             SeqError::InvalidSymbol { pos, symbol } => {
-                PyValueError::new_err(format!("Invalid symbol '{}' at position {}", symbol, pos))
+                PyValueError::new_err(format!("Invalid symbol '{symbol}' at position {pos}"))
             }
             SeqError::InvalidKmerLength { got } => {
-                PyValueError::new_err(format!("Invalid K-mer length: {}", got))
+                PyValueError::new_err(format!("Invalid K-mer length: {got}"))
             }
             SeqError::SliceOutOfBounds { index, len } => {
-                PyIndexError::new_err(format!("Index {} out of bounds for length {}", index, len))
+                PyIndexError::new_err(format!("Index {index} out of bounds for length {len}"))
             }
             SeqError::KmerTooLarge { got, max, bits } => PyValueError::new_err(format!(
-                "K-mer length {} exceeds capacity (max {} for {}-bit symbols)",
-                got, max, bits
+                "K-mer length {got} exceeds capacity (max {max} for {bits}-bit symbols)"
             )),
             SeqError::NoComplementForCodec { codec } => PyValueError::new_err(format!(
-                "Complement operation not supported for codec {}",
-                codec
+                "Complement operation not supported for codec {codec}"
             )),
+            SeqError::UnsupportedBitsPerSymbol { bits } => PyValueError::new_err(format!(
+                "Unsupported bits per symbol: {bits} (must be between 1 and 8)"
+            )),
+            SeqError::SequenceTooLong { len } => {
+                PyOverflowError::new_err(format!("Sequence too large to encode: {len} symbols"))
+            }
         }
     }
 }
