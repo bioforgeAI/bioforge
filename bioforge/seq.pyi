@@ -4,7 +4,8 @@ class DnaSequence:
     """Séquence d'ADN stricte (A, C, G, T) encodée sur 2 bits.
 
     Args:
-        seq: Chaîne de caractères représentant l'ADN. Doit contenir uniquement A, C, G, T (casse ignorée).
+        seq: Chaîne de caractères représentant l'ADN.
+        Doit contenir uniquement A, C, G, T (casse ignorée).
 
     Raises:
         ValueError: Si `seq` contient un caractère invalide.

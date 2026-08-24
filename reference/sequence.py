@@ -2,7 +2,8 @@
 """
 Implémentation de référence naïve et transparente pour la séquence ADN.
 CE FICHIER NE DOIT JAMAIS ÊTRE IMPORTÉ DANS src/ OU bioforge/.
-Usage autorisé : Uniquement dans les tests différentiels (tests/test_sequence_differential.py).
+Usage autorisé : Uniquement dans les tests différentiels
+(tests/test_sequence_differential.py).
 """
 
 # Dictionnaire de canonicalisation explicite (conforme à la logique Rust MVP)
@@ -27,7 +28,8 @@ _CANONICAL_MAP: dict[str, str] = {
 
 
 def canonicalize(seq: str) -> str:
-    """Normalise la séquence : majuscules + dégradation des bases ambiguës complexes en 'N'."""
+    """Normalise la séquence : majuscules +
+    dégradation des bases ambiguës complexes en 'N'."""
     result: list[str] = []
     for char in seq:
         upper_char = char.upper()
@@ -63,5 +65,7 @@ class ReferenceSequence:
         return "".join(self._symbols)
 
     def to_bytes(self) -> bytes:
-        """Retourne une représentation bytes naïve (pour comparaison conceptuelle, pas bit-à-bit)."""
+        """Retourne une représentation bytes naïve
+        (pour comparaison conceptuelle, pas bit-à-bit).
+        """
         return self.to_string().encode("ascii")
