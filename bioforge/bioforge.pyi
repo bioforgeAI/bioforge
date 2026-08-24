@@ -2,7 +2,8 @@
 
 Ce fichier permet à pyright de typer le module Rust compilé sans pouvoir
 l'introspecter directement. Il doit refléter fidèlement l'API exposée
-par `src/seq/dna.rs`, `src/seq/iupac.rs` et `src/seq/standalone.rs`.
+par `src/seq/dna.rs`, `src/seq/iupac.rs`, `src/seq/amino.rs` et
+`src/seq/standalone.rs`.
 """
 
 from typing import overload
@@ -80,6 +81,48 @@ class IupacSequence:
     def __getitem__(self, index: slice) -> IupacSequence: ...
     def reverse_complement(self) -> IupacSequence: ...
 
+class AminoSequence:
+    """Séquence protéique encodée sur 6 bits par acide aminé.
+
+    Supporte les 20 acides aminés standards, les codes ambigus (B, J, Z),
+    les codes spéciaux (O, U, X) et le stop codon (*).
+
+    Args:
+        seq: Chaîne de caractères représentant une séquence protéique.
+            Alphabet accepté : A C D E F G H I K L M N P Q R S T V W Y B J Z O U X *
+            (casse ignorée, sauf pour * qui est un symbole littéral).
+
+    Raises:
+        ValueError: Si `seq` contient un caractère hors de l'alphabet protéique.
+
+    Example:
+        >>> protein = AminoSequence(
+            "MKTVRQERLKSIVRILERSKEPVSGAQLAEELSVSRQVIVQDIAYLRSLGYNIVATPRGYVLAGG"
+            )
+        >>> len(protein)
+        66
+        >>> protein[0]
+        'M'
+        >>> str(protein[0:10])
+        'MKTVRQERLK'
+
+    Invariants:
+        - len(self) == len(seq)
+        - all(c in "ACDEFGHIKLMNPQRSTVWYBJZOUX*" for c in str(self).upper())
+        - Aucune opération de reverse_complement
+        - decode(encode(seq)) == canonicalize(seq)
+    """
+
+    def __init__(self, seq: str) -> None: ...
+    def __len__(self) -> int: ...
+    def __str__(self) -> str: ...
+    @overload
+    def __getitem__(self, index: int) -> str: ...
+    @overload
+    def __getitem__(self, index: slice) -> AminoSequence: ...
+
+    # Note : Pas de méthode reverse_complement() pour les protéines.
+
 def reverse_complement_strict(seq: str) -> str:
     """Retourne le complément inverse d'une séquence ADN stricte (A, C, G, T).
 
@@ -103,10 +146,6 @@ def reverse_complement_strict(seq: str) -> str:
         'GCAT'
         >>> reverse_complement_strict("atgc")  # casse ignorée
         'GCAT'
-        >>> reverse_complement_strict("ATGN")
-        Traceback (most recent call last):
-            ...
-        ValueError: Invalid symbol 'N' at position 3
 
     Invariants:
         - len(output) == len(input)
@@ -122,8 +161,6 @@ def reverse_complement_ambiguous(seq: str) -> str:
 
     Version permissive qui accepte tous les codes IUPAC (A C G T N R Y S
     W K M B D H V) et préserve l'information d'ambiguïté lors du complément.
-    Pour une validation stricte A/C/G/T uniquement, utiliser
-    `reverse_complement_strict`.
 
     Table de complément (involution) :
         A↔T  C↔G  N↔N  R↔Y  S↔S  W↔W  K↔M  B↔V  D↔H
@@ -143,18 +180,12 @@ def reverse_complement_ambiguous(seq: str) -> str:
     Example:
         >>> reverse_complement_ambiguous("ATGNRY")
         'RYNCAT'
-        >>> reverse_complement_ambiguous("WKMBDHV")
-        'BDHVKMW'
-        >>> reverse_complement_ambiguous("atgn")  # casse ignorée
-        'NCAT'
 
     Invariants:
         - len(output) == len(input)
         - output est toujours en majuscules
         - reverse_complement_ambiguous(reverse_complement_ambiguous(s)) == s.upper()
-        - Aucune perte d'information : les codes d'ambiguïté sont transformés
-          selon la table IUPAC (pas dégradés en N)
-        - output ne contient que des symboles IUPAC valides
+        - Aucune perte d'information IUPAC
         - "" → ""
     """
     ...

@@ -5,6 +5,7 @@ Architecture inspirée de bio-seq (MIT License).
 """
 
 from .bioforge import (
+    AminoSequence,
     DnaSequence,
     IupacSequence,
     reverse_complement_ambiguous,
@@ -14,6 +15,7 @@ from .bioforge import (
 __all__ = [
     "DnaSequence",
     "IupacSequence",
+    "AminoSequence",
     "reverse_complement_strict",
     "reverse_complement_ambiguous",
 ]

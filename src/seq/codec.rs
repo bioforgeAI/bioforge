@@ -189,3 +189,118 @@ impl Codec for Iupac {
         ]
     }
 }
+
+/// Codec pour les séquences protéiques (6-bit).
+///
+/// # Description
+/// Supporte les 20 acides aminés standards + codes ambigus (B, J, Z) +
+/// codes spéciaux (O, U, X) + stop codon (*). Total : 27 symboles.
+///
+/// # Alphabet et encodage
+/// Mapping séquentiel alphabétique strict : A=0, B=1, C=2, ..., Z=25, *=26.
+/// Cette densité garantit un tableau de lookup sans trous, optimal pour
+/// les conversions au moment de la compilation.
+///
+/// # Absence de complément
+/// Les protéines n'ont pas de brin complémentaire. La méthode `complement`
+/// du trait `Codec` retourne donc `None` (implémentation par défaut).
+#[derive(Copy, Clone, Debug)]
+pub struct Amino;
+
+impl Codec for Amino {
+    type Symbol = char;
+    const BITS_PER_SYMBOL: usize = 6;
+
+    /// Encode un acide aminé en sa valeur 6-bit.
+    ///
+    /// # Arguments
+    /// * `symbol` : caractère représentant un acide aminé.
+    ///
+    /// # Returns
+    /// * `Some(u8)` : valeur encodée (0-26) si le symbole est valide.
+    /// * `None` : si le symbole n'appartient pas à l'alphabet protéique.
+    fn encode(symbol: char) -> Option<u8> {
+        match symbol.to_ascii_uppercase() {
+            'A' => Some(0),
+            'B' => Some(1),
+            'C' => Some(2),
+            'D' => Some(3),
+            'E' => Some(4),
+            'F' => Some(5),
+            'G' => Some(6),
+            'H' => Some(7),
+            'I' => Some(8),
+            'J' => Some(9),
+            'K' => Some(10),
+            'L' => Some(11),
+            'M' => Some(12),
+            'N' => Some(13),
+            'O' => Some(14),
+            'P' => Some(15),
+            'Q' => Some(16),
+            'R' => Some(17),
+            'S' => Some(18),
+            'T' => Some(19),
+            'U' => Some(20),
+            'V' => Some(21),
+            'W' => Some(22),
+            'X' => Some(23),
+            'Y' => Some(24),
+            'Z' => Some(25),
+            '*' => Some(26),
+            _ => None,
+        }
+    }
+
+    /// Décode une valeur 6-bit en un acide aminé.
+    ///
+    /// # Arguments
+    /// * `value` : valeur binaire (0-26).
+    ///
+    /// # Returns
+    /// * `Some(char)` : acide aminé correspondant.
+    /// * `None` : si la valeur est hors de l'alphabet (27-63).
+    fn decode(value: u8) -> Option<char> {
+        match value {
+            0 => Some('A'),
+            1 => Some('B'),
+            2 => Some('C'),
+            3 => Some('D'),
+            4 => Some('E'),
+            5 => Some('F'),
+            6 => Some('G'),
+            7 => Some('H'),
+            8 => Some('I'),
+            9 => Some('J'),
+            10 => Some('K'),
+            11 => Some('L'),
+            12 => Some('M'),
+            13 => Some('N'),
+            14 => Some('O'),
+            15 => Some('P'),
+            16 => Some('Q'),
+            17 => Some('R'),
+            18 => Some('S'),
+            19 => Some('T'),
+            20 => Some('U'),
+            21 => Some('V'),
+            22 => Some('W'),
+            23 => Some('X'),
+            24 => Some('Y'),
+            25 => Some('Z'),
+            26 => Some('*'),
+            _ => None,
+        }
+    }
+
+    /// Retourne la liste de tous les symboles valides.
+    ///
+    /// # Returns
+    /// * `&'static [char]` : les 27 symboles de l'alphabet protéique.
+    fn symbols() -> &'static [char] {
+        &[
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+            'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '*',
+        ]
+    }
+}
