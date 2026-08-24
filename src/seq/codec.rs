@@ -8,6 +8,13 @@ pub trait Codec: Copy + Clone + Send + Sync + 'static {
     fn complement(_symbol: Self::Symbol) -> Option<Self::Symbol> {
         None
     }
+
+    /// Retourne la liste de tous les symboles valides du codec.
+    ///
+    /// # Description
+    /// Utilisé pour la validation et l'itération sur l'alphabet complet.
+    /// Sera consommé par les futurs parseurs et la génération de Kmers.
+    #[allow(dead_code)] // Méthode du trait réservée à la validation et aux futurs codecs
     fn symbols() -> &'static [Self::Symbol];
 }
 
@@ -98,6 +105,7 @@ impl Codec for Dna {
 // ==========================================
 // Codec IUPAC (4-bit)
 // ==========================================
+#[allow(dead_code)] // Codec implémenté mais pas encore exposé via PyO3 (Phase 2)
 #[derive(Copy, Clone, Debug)]
 pub struct Iupac;
 

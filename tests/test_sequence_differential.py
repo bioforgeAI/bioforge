@@ -1,3 +1,10 @@
+"""
+Tests différentiels : prouve que l'implémentation Rust se comporte exactement
+comme la référence naïve pour toute entrée valide générée par Hypothesis.
+
+Conforme à la charte BioForge v4.4 §7 : utilisation de hypothesis.
+"""
+
 import random
 
 import pytest
@@ -8,13 +15,12 @@ from bioforge import DnaSequence
 from reference.sequence import ReferenceSequence
 
 # Alphabet valide pour la génération Hypothesis (majuscules et minuscules)
-# La référence et DnaSequence normaliseront tout en majuscules.
 DNA_ALPHABET = "ACGTacgt"
 
 
 @given(seq=text(alphabet=sampled_from(DNA_ALPHABET), min_size=0, max_size=1000))
 @settings(max_examples=500)
-def test_rust_matches_reference_length_and_string(seq: str):
+def test_rust_matches_reference_length_and_string(seq: str) -> None:
     """Vérifie que la longueur et la représentation string sont identiques."""
     ref = ReferenceSequence(seq)
     rust = DnaSequence(seq)
@@ -25,7 +31,7 @@ def test_rust_matches_reference_length_and_string(seq: str):
 
 @given(seq=text(alphabet=sampled_from(DNA_ALPHABET), min_size=1, max_size=500))
 @settings(max_examples=500)
-def test_rust_matches_reference_getitem(seq: str):
+def test_rust_matches_reference_getitem(seq: str) -> None:
     """Vérifie l'accès par index (positif et négatif) sur toute la séquence."""
     ref = ReferenceSequence(seq)
     rust = DnaSequence(seq)
@@ -41,7 +47,7 @@ def test_rust_matches_reference_getitem(seq: str):
         assert rust[-(idx + 1)] == ref[-(idx + 1)]
 
 
-def test_rust_matches_reference_errors():
+def test_rust_matches_reference_errors() -> None:
     """Vérifie que les erreurs sont levées de manière cohérente."""
     # Caractère invalide
     with pytest.raises(ValueError):

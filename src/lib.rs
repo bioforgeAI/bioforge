@@ -1,10 +1,11 @@
 use pyo3::prelude::*;
+use pyo3::Bound;
 
-pub mod seq;
+mod seq;
 
 #[pymodule]
-fn bioforge(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    // Exposition du module seq et de ses classes
+fn bioforge(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
+    // ✅ Utilise le raccourci défini dans seq/mod.rs
     m.add_class::<seq::PyDnaSequence>()?;
     Ok(())
 }

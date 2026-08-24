@@ -1,4 +1,4 @@
-# Charte d'Ingénierie BioForge (v4.4) - Norme de Production
+# Charte d'Ingénierie BioForge (v4.5) - Norme de Production
 Ce document définit les règles strictes, binaires et scientifiquement rigoureuses pour le développement de BioForge. Toute génération de code par une IA doit s'y conformer. Le non-respect de ces règles invalide la génération.
 ## 1. Environnement, Stack et Workflow
 - **Python** : 3.12+ minimum (avec conscience de la compatibilité free-threaded 3.13+). Utiliser les fonctionnalités natives de typage (`type Alias = ...`, `def func[T](x: T)`).
@@ -69,7 +69,7 @@ rust-version = "1.70.0"
       - IUPAC : 4 bits/symbole (16 codes d'ambiguïté, conservation totale de l'information).
       - Amino : 6 bits/symbole (25+ acides aminés et caractères spéciaux).
     - **Règle d'abstraction** : Le bit-packing est un détail d'implémentation caché derrière le trait `Codec`. L'API publique (Rust et Python) ne doit jamais exposer directement les octets bruts, mais toujours des symboles biologiques. Les vues (`SeqSlice`) doivent permettre des opérations zero-copy en interne.
-- **Encapsulation Python** : Les vues mémoire provenant de Rust DOIVENT être encapsulées dans des classes Python sûres (ex: `Sequence3Bit`) exposant une API propre (`__getitem__`, `__len__`). L'accès direct à la mémoire brute est interdit.
+- **Encapsulation Python** : Les vues mémoire provenant de Rust DOIVENT être encapsulées dans des classes Python sûres (ex: `DnaSequence`, `IupacSequence`) exposant une API propre (`__getitem__`, `__len__`). L'accès direct à la mémoire brute est interdit.
 
 ## 5. Gestion des Dépendances
 - **Python Core** : `pyarrow`, `numpy`, `pydantic`. (Optionnel : `polars`, `httpx`, `rich`). Dev : `pytest`, `pytest-benchmark`, `pytest-regressions`, `hypothesis`, `ruff`, `pyright`.
