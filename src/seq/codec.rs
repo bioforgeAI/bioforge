@@ -21,7 +21,7 @@ pub trait Codec: Copy + Clone + Send + Sync + 'static {
 // ==========================================
 // Codec DNA (2-bit)
 // ==========================================
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Dna;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
@@ -113,7 +113,7 @@ impl Codec for Dna {
 // Codec IUPAC (4-bit)
 // ==========================================
 #[allow(dead_code)] // Codec implémenté mais pas encore exposé via PyO3 (Phase 2)
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Iupac;
 
 impl Codec for Iupac {
