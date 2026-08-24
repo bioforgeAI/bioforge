@@ -10,6 +10,7 @@ use pyo3::types::PySlice;
 use super::codec::{Dna, DnaBase};
 use super::core::Seq;
 use super::error::SeqError;
+use super::kmer::PyDnaKmerIterator;
 
 /// Wrapper `PyO3` pour `Seq<Dna>`, exposé à Python sous le nom `DnaSequence`.
 #[pyclass(module = "bioforge.seq", name = "DnaSequence")]
@@ -134,5 +135,23 @@ impl PyDnaSequence {
         Ok(PyDnaSequence {
             inner: self.inner.reverse_complement()?,
         })
+    }
+
+    /// Itère sur tous les k-mers de longueur k, de gauche à droite.
+    ///
+    /// # Arguments
+    /// * `k` : longueur des k-mers (1 <= k <= len(self)).
+    ///
+    /// # Returns
+    /// * `PyResult<PyDnaKmerIterator>` : itérateur paresseux sur les k-mers.
+    ///
+    /// # Errors
+    /// * `ValueError` : si k == 0 ou k > len(self).
+    #[pyo3(signature = (k, /))]
+    pub fn kmers(&self, k: usize) -> PyResult<PyDnaKmerIterator> {
+        if k == 0 || k > self.inner.len() {
+            return Err(SeqError::InvalidKmerLength { got: k }.into());
+        }
+        Ok(PyDnaKmerIterator::new(self.inner.clone(), k))
     }
 }

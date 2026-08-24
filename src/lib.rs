@@ -15,6 +15,10 @@ fn bioforge(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<seq::PyIupacSequence>()?;
     m.add_class::<seq::PyAminoSequence>()?;
 
+    // K-mers
+    m.add_class::<seq::PyDnaKmer>()?;
+    m.add_class::<seq::PyDnaKmerIterator>()?;
+
     // Fonctions standalone
     m.add_function(wrap_pyfunction!(seq::reverse_complement_strict, m)?)?;
     m.add_function(wrap_pyfunction!(seq::reverse_complement_ambiguous, m)?)?;

@@ -6,6 +6,7 @@ par `src/seq/dna.rs`, `src/seq/iupac.rs`, `src/seq/amino.rs` et
 `src/seq/standalone.rs`.
 """
 
+from collections.abc import Iterator
 from typing import overload
 
 class DnaSequence:
@@ -123,6 +124,49 @@ class AminoSequence:
 
     # Note : Pas de méthode reverse_complement() pour les protéines.
 
+class DnaKmer:
+    """Un k-mer d'ADN de longueur fixe, encodé de manière compacte.
+
+    Un k-mer est une sous-séquence d'ADN de longueur k. Le stockage est
+    compact (2 bits/base dans un registre u128), ce qui permet un hashing
+    parfait sans collision pour k <= 64.
+
+    Args:
+        seq: Chaîne de caractères représentant le k-mer. Doit contenir
+            uniquement A, C, G, T (casse ignorée). La longueur détermine k.
+            Doit être non-vide et <= 64.
+
+    Raises:
+        ValueError: Si `seq` est vide, si sa longueur dépasse 64, ou si
+            elle contient un caractère autre que A/C/G/T.
+
+    Example:
+        >>> kmer = DnaKmer("ATGC")
+        >>> len(kmer)
+        4
+        >>> str(kmer.reverse_complement())
+        'GCAT'
+        >>> kmer == DnaKmer("ATGC")
+        True
+
+    Invariants:
+        - len(self) == len(seq)
+        - 1 <= len(self) <= 64
+        - all(c in "ACGT" for c in str(self))
+        - hash(kmer) est stable, déterministe et sans collision pour k <= 64
+        - (a == b) implique hash(a) == hash(b)
+        - canonical() retourne min(self, reverse_complement())
+        - canonical() est idempotent
+    """
+
+    def __init__(self, seq: str) -> None: ...
+    def __len__(self) -> int: ...
+    def __str__(self) -> str: ...
+    def __hash__(self) -> int: ...
+    def __eq__(self, other: object) -> bool: ...
+    def reverse_complement(self) -> DnaKmer: ...
+    def canonical(self) -> DnaKmer: ...
+
 def reverse_complement_strict(seq: str) -> str:
     """Retourne le complément inverse d'une séquence ADN stricte (A, C, G, T).
 
@@ -189,3 +233,27 @@ def reverse_complement_ambiguous(seq: str) -> str:
         - "" → ""
     """
     ...
+
+    def kmers(self, k: int) -> Iterator[DnaKmer]:
+        """Itère sur tous les k-mers de longueur k, de gauche à droite.
+
+        Args:
+            k: Longueur des k-mers. Doit être >= 1 et <= len(self).
+
+        Returns:
+            Iterator[DnaKmer]: Itérateur paresseux sur les k-mers.
+
+        Raises:
+            ValueError: Si k < 1 ou k > len(self).
+
+        Example:
+            >>> seq = DnaSequence("ATGCA")
+            >>> [str(k) for k in seq.kmers(3)]
+            ['ATG', 'TGC', 'GCA']
+
+        Invariants:
+            - Nombre de k-mers == len(self) - k + 1
+            - Chaque k-mer a une longueur == k
+            - L'ordre est déterministe (gauche à droite)
+        """
+        ...

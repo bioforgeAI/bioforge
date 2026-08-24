@@ -16,7 +16,7 @@ use super::error::SeqError;
 /// Structure générique sur un `Codec`. Le stockage (`Vec<u8>`) est un détail
 /// d'implémentation : l'API publique n'expose que des symboles biologiques,
 /// conformément à la charte v4.4 §4.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Seq<C: Codec> {
     data: Vec<u8>,
     len: usize,
