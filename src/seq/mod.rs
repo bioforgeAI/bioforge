@@ -2,6 +2,7 @@ pub mod codec;
 pub mod core;
 pub mod dna;
 pub mod error;
+pub mod iupac;
 
-// Exposition des types Python au niveau du module `seq`
 pub use dna::PyDnaSequence;
+pub use iupac::PyIupacSequence;

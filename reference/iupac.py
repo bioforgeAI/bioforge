@@ -11,10 +11,10 @@ from __future__ import annotations
 _IUPAC_ALPHABET = frozenset("ACGTNRYSWKMBDHV")
 
 # Table de complément IUPAC complète (involution)
-# A↔T, C↔G, R(A/G)↔Y(C/T), S(G/C)↔S, W(A/T)↔W, K(G/T)↔M(A/C), B(C/G/T)↔V(A/C/G), D(A/G/T)↔H(A/C/T)
+# A↔T, C↔G, R↔Y, S↔S, W↔W, K↔M, B↔V, D↔H, N↔N
 _COMPLEMENT_TABLE = str.maketrans(
-    "ACGTRYSWKMBDHVN",
-    "TGCAYRSWMKVHDNB",
+    "ACGTNRYSWKMBDHV",  # source : 15 symboles IUPAC
+    "TGCANYRSWMKVHDB",  # cible : compléments correspondants
 )
 
 
