@@ -84,7 +84,7 @@ impl<C: Codec> Seq<C> {
 
         let mut data = vec![0_u8; capacity];
         for (i, symbol) in symbols.into_iter().enumerate() {
-            let val = C::encode(symbol).ok_or(SeqError::InvalidSymbol {
+            let val = C::encode(symbol).ok_or_else(|| SeqError::InvalidSymbol {
                 pos: i,
                 symbol: symbol.to_string().chars().next().unwrap_or('?'),
             })?;

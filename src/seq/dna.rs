@@ -47,11 +47,13 @@ impl PyDnaSequence {
     }
 
     /// Retourne la longueur de la séquence.
+    #[must_use]
     pub fn __len__(&self) -> usize {
         self.inner.len()
     }
 
     /// Retourne la séquence sous forme de chaîne de caractères ASCII.
+    #[must_use]
     pub fn __str__(&self) -> String {
         let mut s = String::with_capacity(self.inner.len());
         for i in 0..self.inner.len() {
@@ -131,6 +133,12 @@ impl PyDnaSequence {
     }
 
     /// Retourne le complément inverse de la séquence.
+    ///
+    /// # Returns
+    /// * `PyResult<Self>` : la séquence complément inverse.
+    ///
+    /// # Errors
+    /// * `ValueError` : si un symbole interne est corrompu (ne devrait pas arriver).
     pub fn reverse_complement(&self) -> PyResult<Self> {
         Ok(PyDnaSequence {
             inner: self.inner.reverse_complement()?,

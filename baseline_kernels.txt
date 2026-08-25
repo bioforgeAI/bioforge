@@ -1,0 +1,238 @@
+    Finished `bench` profile [optimized] target(s) in 0.62s
+     Running unittests src/lib.rs (target/release/deps/bioforge-0746c7dbffe2ac46)
+
+running 3 tests
+test seq::core::tests::dna_roundtrip_preserves_symbols ... ignored
+test seq::core::tests::odd_length_sequence_roundtrips ... ignored
+test seq::core::tests::reverse_complement_is_involution ... ignored
+
+test result: ok. 0 passed; 0 failed; 3 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running benches/bench_kernels.rs (target/release/deps/bench_kernels-7f5dbbf4cba62d30)
+Gnuplot not found, using plotters backend
+Benchmarking kernel_encode_dna/1000
+Benchmarking kernel_encode_dna/1000: Warming up for 3.0000 s
+Benchmarking kernel_encode_dna/1000: Collecting 100 samples in estimated 5.0063 s (3.8M iterations)
+Benchmarking kernel_encode_dna/1000: Analyzing
+kernel_encode_dna/1000  time:   [1.3504 µs 1.3678 µs 1.3855 µs]
+                        change: [+0.3551% +2.1471% +3.9647%] (p = 0.02 < 0.05)
+                        Change within noise threshold.
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+Benchmarking kernel_encode_dna/1001
+Benchmarking kernel_encode_dna/1001: Warming up for 3.0000 s
+Benchmarking kernel_encode_dna/1001: Collecting 100 samples in estimated 5.0076 s (3.1M iterations)
+Benchmarking kernel_encode_dna/1001: Analyzing
+kernel_encode_dna/1001  time:   [1.3728 µs 1.3939 µs 1.4182 µs]
+                        change: [-10.070% -4.1061% +1.9062%] (p = 0.24 > 0.05)
+                        No change in performance detected.
+Found 8 outliers among 100 measurements (8.00%)
+  5 (5.00%) high mild
+  3 (3.00%) high severe
+Benchmarking kernel_encode_dna/1002
+Benchmarking kernel_encode_dna/1002: Warming up for 3.0000 s
+Benchmarking kernel_encode_dna/1002: Collecting 100 samples in estimated 5.0063 s (3.4M iterations)
+Benchmarking kernel_encode_dna/1002: Analyzing
+kernel_encode_dna/1002  time:   [1.3508 µs 1.3906 µs 1.4565 µs]
+                        change: [-3.0057% +0.0364% +3.4868%] (p = 0.99 > 0.05)
+                        No change in performance detected.
+Found 12 outliers among 100 measurements (12.00%)
+  4 (4.00%) high mild
+  8 (8.00%) high severe
+Benchmarking kernel_encode_dna/1003
+Benchmarking kernel_encode_dna/1003: Warming up for 3.0000 s
+Benchmarking kernel_encode_dna/1003: Collecting 100 samples in estimated 5.0001 s (2.6M iterations)
+Benchmarking kernel_encode_dna/1003: Analyzing
+kernel_encode_dna/1003  time:   [1.3773 µs 1.4053 µs 1.4413 µs]
+                        change: [-5.4323% -3.0588% -0.7362%] (p = 0.01 < 0.05)
+                        Change within noise threshold.
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+Benchmarking kernel_encode_dna/10000
+Benchmarking kernel_encode_dna/10000: Warming up for 3.0000 s
+Benchmarking kernel_encode_dna/10000: Collecting 100 samples in estimated 5.0149 s (364k iterations)
+Benchmarking kernel_encode_dna/10000: Analyzing
+kernel_encode_dna/10000 time:   [11.950 µs 12.088 µs 12.273 µs]
+                        change: [-3.9438% +0.0228% +7.3151%] (p = 1.00 > 0.05)
+                        No change in performance detected.
+Found 17 outliers among 100 measurements (17.00%)
+  2 (2.00%) low mild
+  9 (9.00%) high mild
+  6 (6.00%) high severe
+Benchmarking kernel_encode_dna/100000
+Benchmarking kernel_encode_dna/100000: Warming up for 3.0000 s
+Benchmarking kernel_encode_dna/100000: Collecting 100 samples in estimated 5.6569 s (40k iterations)
+Benchmarking kernel_encode_dna/100000: Analyzing
+kernel_encode_dna/100000
+                        time:   [130.17 µs 135.03 µs 141.18 µs]
+                        change: [+5.4554% +11.304% +20.542%] (p = 0.00 < 0.05)
+                        Performance has regressed.
+Found 12 outliers among 100 measurements (12.00%)
+  3 (3.00%) high mild
+  9 (9.00%) high severe
+
+Benchmarking kernel_decode_full_dna/1000
+Benchmarking kernel_decode_full_dna/1000: Warming up for 3.0000 s
+Benchmarking kernel_decode_full_dna/1000: Collecting 100 samples in estimated 5.0053 s (3.3M iterations)
+Benchmarking kernel_decode_full_dna/1000: Analyzing
+kernel_decode_full_dna/1000
+                        time:   [1.5646 µs 1.6448 µs 1.7574 µs]
+                        change: [-10.202% -7.4081% -3.7351%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Found 11 outliers among 100 measurements (11.00%)
+  2 (2.00%) low mild
+  5 (5.00%) high mild
+  4 (4.00%) high severe
+Benchmarking kernel_decode_full_dna/1001
+Benchmarking kernel_decode_full_dna/1001: Warming up for 3.0000 s
+Benchmarking kernel_decode_full_dna/1001: Collecting 100 samples in estimated 5.0040 s (3.2M iterations)
+Benchmarking kernel_decode_full_dna/1001: Analyzing
+kernel_decode_full_dna/1001
+                        time:   [1.5840 µs 1.6049 µs 1.6269 µs]
+                        change: [-10.413% -1.1025% +5.1543%] (p = 0.85 > 0.05)
+                        No change in performance detected.
+Benchmarking kernel_decode_full_dna/1002
+Benchmarking kernel_decode_full_dna/1002: Warming up for 3.0000 s
+Benchmarking kernel_decode_full_dna/1002: Collecting 100 samples in estimated 5.0052 s (3.3M iterations)
+Benchmarking kernel_decode_full_dna/1002: Analyzing
+kernel_decode_full_dna/1002
+                        time:   [1.4847 µs 1.4943 µs 1.5038 µs]
+                        change: [-10.396% -9.1759% -8.0109%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Found 14 outliers among 100 measurements (14.00%)
+  1 (1.00%) low severe
+  6 (6.00%) low mild
+  3 (3.00%) high mild
+  4 (4.00%) high severe
+Benchmarking kernel_decode_full_dna/1003
+Benchmarking kernel_decode_full_dna/1003: Warming up for 3.0000 s
+Benchmarking kernel_decode_full_dna/1003: Collecting 100 samples in estimated 5.0069 s (3.4M iterations)
+Benchmarking kernel_decode_full_dna/1003: Analyzing
+kernel_decode_full_dna/1003
+                        time:   [1.4753 µs 1.4839 µs 1.4919 µs]
+                        change: [-1.6640% -1.1285% -0.5164%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+Benchmarking kernel_decode_full_dna/10000
+Benchmarking kernel_decode_full_dna/10000: Warming up for 3.0000 s
+Benchmarking kernel_decode_full_dna/10000: Collecting 100 samples in estimated 5.0053 s (354k iterations)
+Benchmarking kernel_decode_full_dna/10000: Analyzing
+kernel_decode_full_dna/10000
+                        time:   [13.624 µs 13.702 µs 13.780 µs]
+                        change: [-7.5061% -6.2911% -5.1373%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+Benchmarking kernel_decode_full_dna/100000
+Benchmarking kernel_decode_full_dna/100000: Warming up for 3.0000 s
+Benchmarking kernel_decode_full_dna/100000: Collecting 100 samples in estimated 5.6090 s (40k iterations)
+Benchmarking kernel_decode_full_dna/100000: Analyzing
+kernel_decode_full_dna/100000
+                        time:   [137.63 µs 138.86 µs 140.25 µs]
+                        change: [-14.266% -12.976% -11.663%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
+
+Benchmarking kernel_get_individual_dna/1000
+Benchmarking kernel_get_individual_dna/1000: Warming up for 3.0000 s
+Benchmarking kernel_get_individual_dna/1000: Collecting 100 samples in estimated 5.0017 s (8.4M iterations)
+Benchmarking kernel_get_individual_dna/1000: Analyzing
+kernel_get_individual_dna/1000
+                        time:   [585.83 ns 589.44 ns 592.92 ns]
+                        change: [-1.3812% -0.7029% +0.0423%] (p = 0.06 > 0.05)
+                        No change in performance detected.
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high severe
+Benchmarking kernel_get_individual_dna/1001
+Benchmarking kernel_get_individual_dna/1001: Warming up for 3.0000 s
+Benchmarking kernel_get_individual_dna/1001: Collecting 100 samples in estimated 5.0007 s (8.5M iterations)
+Benchmarking kernel_get_individual_dna/1001: Analyzing
+kernel_get_individual_dna/1001
+                        time:   [581.48 ns 585.26 ns 589.29 ns]
+                        change: [-9.9019% -7.6042% -5.9505%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Benchmarking kernel_get_individual_dna/1002
+Benchmarking kernel_get_individual_dna/1002: Warming up for 3.0000 s
+Benchmarking kernel_get_individual_dna/1002: Collecting 100 samples in estimated 5.0011 s (8.4M iterations)
+Benchmarking kernel_get_individual_dna/1002: Analyzing
+kernel_get_individual_dna/1002
+                        time:   [584.66 ns 588.47 ns 592.28 ns]
+                        change: [-11.316% -8.0370% -5.4246%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Benchmarking kernel_get_individual_dna/1003
+Benchmarking kernel_get_individual_dna/1003: Warming up for 3.0000 s
+Benchmarking kernel_get_individual_dna/1003: Collecting 100 samples in estimated 5.0018 s (8.5M iterations)
+Benchmarking kernel_get_individual_dna/1003: Analyzing
+kernel_get_individual_dna/1003
+                        time:   [584.22 ns 587.86 ns 591.60 ns]
+                        change: [-16.821% -11.594% -6.9943%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high severe
+Benchmarking kernel_get_individual_dna/10000
+Benchmarking kernel_get_individual_dna/10000: Warming up for 3.0000 s
+Benchmarking kernel_get_individual_dna/10000: Collecting 100 samples in estimated 5.0020 s (853k iterations)
+Benchmarking kernel_get_individual_dna/10000: Analyzing
+kernel_get_individual_dna/10000
+                        time:   [5.7981 µs 5.8327 µs 5.8670 µs]
+                        change: [-8.9793% -7.6469% -6.6032%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Benchmarking kernel_get_individual_dna/100000
+Benchmarking kernel_get_individual_dna/100000: Warming up for 3.0000 s
+Benchmarking kernel_get_individual_dna/100000: Collecting 100 samples in estimated 5.0624 s (86k iterations)
+Benchmarking kernel_get_individual_dna/100000: Analyzing
+kernel_get_individual_dna/100000
+                        time:   [58.148 µs 58.509 µs 58.848 µs]
+                        change: [-2.8331% -2.0868% -1.3200%] (p = 0.00 < 0.05)
+                        Performance has improved.
+
+Benchmarking kernel_reverse_complement_dna/1000
+Benchmarking kernel_reverse_complement_dna/1000: Warming up for 3.0000 s
+Benchmarking kernel_reverse_complement_dna/1000: Collecting 100 samples in estimated 5.0068 s (1.9M iterations)
+Benchmarking kernel_reverse_complement_dna/1000: Analyzing
+kernel_reverse_complement_dna/1000
+                        time:   [2.6150 µs 2.6332 µs 2.6518 µs]
+Benchmarking kernel_reverse_complement_dna/1001
+Benchmarking kernel_reverse_complement_dna/1001: Warming up for 3.0000 s
+Benchmarking kernel_reverse_complement_dna/1001: Collecting 100 samples in estimated 5.0113 s (1.9M iterations)
+Benchmarking kernel_reverse_complement_dna/1001: Analyzing
+kernel_reverse_complement_dna/1001
+                        time:   [2.6589 µs 2.6757 µs 2.6910 µs]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+Benchmarking kernel_reverse_complement_dna/1002
+Benchmarking kernel_reverse_complement_dna/1002: Warming up for 3.0000 s
+Benchmarking kernel_reverse_complement_dna/1002: Collecting 100 samples in estimated 5.0026 s (1.8M iterations)
+Benchmarking kernel_reverse_complement_dna/1002: Analyzing
+kernel_reverse_complement_dna/1002
+                        time:   [2.6171 µs 2.6350 µs 2.6532 µs]
+Benchmarking kernel_reverse_complement_dna/1003
+Benchmarking kernel_reverse_complement_dna/1003: Warming up for 3.0000 s
+Benchmarking kernel_reverse_complement_dna/1003: Collecting 100 samples in estimated 5.0031 s (1.9M iterations)
+Benchmarking kernel_reverse_complement_dna/1003: Analyzing
+kernel_reverse_complement_dna/1003
+                        time:   [2.6107 µs 2.6260 µs 2.6415 µs]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+Benchmarking kernel_reverse_complement_dna/10000
+Benchmarking kernel_reverse_complement_dna/10000: Warming up for 3.0000 s
+Benchmarking kernel_reverse_complement_dna/10000: Collecting 100 samples in estimated 5.0447 s (202k iterations)
+Benchmarking kernel_reverse_complement_dna/10000: Analyzing
+kernel_reverse_complement_dna/10000
+                        time:   [24.640 µs 24.872 µs 25.124 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
+Benchmarking kernel_reverse_complement_dna/100000
+Benchmarking kernel_reverse_complement_dna/100000: Warming up for 3.0000 s
+Benchmarking kernel_reverse_complement_dna/100000: Collecting 100 samples in estimated 5.0605 s (20k iterations)
+Benchmarking kernel_reverse_complement_dna/100000: Analyzing
+kernel_reverse_complement_dna/100000
+                        time:   [245.46 µs 247.13 µs 248.82 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
+

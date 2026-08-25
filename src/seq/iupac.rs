@@ -62,6 +62,7 @@ impl PyIupacSequence {
     ///
     /// # Returns
     /// * `usize` : nombre de symboles.
+    #[must_use]
     pub fn __len__(&self) -> usize {
         self.inner.len()
     }
@@ -70,6 +71,7 @@ impl PyIupacSequence {
     ///
     /// # Returns
     /// * `String` : la séquence décodée en majuscules.
+    #[must_use]
     pub fn __str__(&self) -> String {
         let mut s = String::with_capacity(self.inner.len());
         for i in 0..self.inner.len() {

@@ -70,6 +70,7 @@ impl PyAminoSequence {
     ///
     /// # Returns
     /// * `usize` : nombre d'acides aminés.
+    #[must_use]
     pub fn __len__(&self) -> usize {
         self.inner.len()
     }
@@ -78,6 +79,7 @@ impl PyAminoSequence {
     ///
     /// # Returns
     /// * `String` : la séquence décodée en majuscules.
+    #[must_use]
     pub fn __str__(&self) -> String {
         let mut s = String::with_capacity(self.inner.len());
         for i in 0..self.inner.len() {

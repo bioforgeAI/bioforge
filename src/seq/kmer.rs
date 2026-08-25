@@ -110,6 +110,15 @@ impl<C: Codec> Kmer<C> {
         self.len
     }
 
+    /// Indique si le k-mer est vide.
+    ///
+    /// # Returns
+    /// * `bool` : `true` si le k-mer ne contient aucun symbole.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
     /// Retourne le symbole à la position `i`.
     ///
     /// # Arguments
@@ -239,11 +248,13 @@ impl PyDnaKmer {
     }
 
     /// Retourne la longueur du k-mer.
+    #[must_use]
     pub fn __len__(&self) -> usize {
         self.inner.len()
     }
 
     /// Retourne le k-mer sous forme de chaîne.
+    #[must_use]
     pub fn __str__(&self) -> String {
         let mut s = String::with_capacity(self.inner.len());
         for i in 0..self.inner.len() {
@@ -265,6 +276,7 @@ impl PyDnaKmer {
     /// Les casts `u128 -> u64` sont intentionnels : ils implémentent le
     /// repli déterministe par XOR des deux moitiés du u128, nécessaire pour
     /// produire un hash Python (int signé 64 bits).
+    #[must_use]
     pub fn __hash__(&self) -> u64 {
         let value = self.inner.encoded_value();
         (value as u64) ^ ((value >> 64) as u64)
@@ -277,12 +289,20 @@ impl PyDnaKmer {
     ///
     /// # Returns
     /// * `bool` : true si même longueur et même valeur encodée.
+    #[must_use]
     pub fn __eq__(&self, other: &Self) -> bool {
         self.inner.len() == other.inner.len()
             && self.inner.encoded_value() == other.inner.encoded_value()
     }
 
     /// Retourne le reverse complement du k-mer.
+    ///
+    /// # Returns
+    /// * `PyResult<Self>` : le k-mer complément inverse.
+    ///
+    /// # Errors
+    /// * `ValueError` : si le codec ne supporte pas le complément ou si un
+    ///   symbole interne est corrompu.
     pub fn reverse_complement(&self) -> PyResult<Self> {
         Ok(Self {
             inner: self.inner.reverse_complement()?,
@@ -290,6 +310,13 @@ impl PyDnaKmer {
     }
 
     /// Retourne le k-mer canonique (min entre self et `reverse_complement`).
+    ///
+    /// # Returns
+    /// * `PyResult<Self>` : le k-mer canonique.
+    ///
+    /// # Errors
+    /// * `ValueError` : si le codec ne supporte pas le complément ou si un
+    ///   symbole interne est corrompu.
     pub fn canonical(&self) -> PyResult<Self> {
         Ok(Self {
             inner: self.inner.canonical()?,
@@ -333,6 +360,7 @@ impl PyDnaKmerIterator {
 #[pymethods]
 impl PyDnaKmerIterator {
     /// Retourne l'itérateur lui-même (protocole d'itération Python).
+    #[must_use]
     pub fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
         slf
     }

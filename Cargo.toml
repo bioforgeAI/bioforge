@@ -6,10 +6,21 @@ rust-version = "1.70.0"
 
 [lib]
 name = "bioforge"
-crate-type = ["cdylib"] # Obligatoire pour les modules Python
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = []
+extension-module = ["pyo3/extension-module"]
 
 [dependencies]
-pyo3 = { version = "0.21", features = ["extension-module"] }
+pyo3 = { version = "0.21" }
 thiserror = "1.0"
-serde = { version = "1.0", features = ["derive"] }           # Ajouté (charte v4.2)
-flate2 = "1.0"                                               # Ajouté (charte v4.2)
+serde = { version = "1.0", features = ["derive"] }
+flate2 = "1.0"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "bench_kernels"
+harness = false

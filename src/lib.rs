@@ -1,7 +1,7 @@
 use pyo3::prelude::*;
 use pyo3::Bound;
 
-mod seq;
+pub mod seq;
 
 /// Module principal de `BioForge` exposé à Python.
 ///

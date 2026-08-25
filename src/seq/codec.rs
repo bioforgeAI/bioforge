@@ -44,6 +44,7 @@ impl std::fmt::Display for DnaBase {
 }
 
 impl DnaBase {
+    #[must_use]
     pub fn from_char(c: char) -> Option<Self> {
         match c.to_ascii_uppercase() {
             'A' => Some(Self::A),

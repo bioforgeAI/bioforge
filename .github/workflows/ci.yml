@@ -115,3 +115,7 @@ jobs:
         run: uv run maturin develop
       - name: Run benchmarks
         run: uv run pytest benchmarks/ -v --benchmark-disable-gc
+      - name: Run Rust benchmarks
+        run: |
+          export LD_LIBRARY_PATH=$(python -c 'import sysconfig; print(sysconfig.get_config_var("LIBDIR"))'):$LD_LIBRARY_PATH
+          cargo bench
