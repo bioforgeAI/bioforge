@@ -1,5 +1,4 @@
-# benchmarks/requirements.txt
-# Version figée pour garantir la reproductibilité des benchmarks différentiels.
-# Mise à jour uniquement après validation manuelle des résultats.
+# Benchmarks BioForge — dépendances de comparaison.
+# Version figée conformément à la charte BioForge v4.5 §7.
+# Mise à jour UNIQUEMENT après validation manuelle.
 biopython==1.84.0
-pytest-benchmark>=4.0.0

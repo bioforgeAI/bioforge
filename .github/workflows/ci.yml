@@ -97,3 +97,21 @@ jobs:
   #       run: cargo +nightly miri test
   #       env:
   #         MIRIFLAGS: "-Zmiri-disable-isolation"
+  benchmarks:
+    runs-on: ubuntu-latest
+    name: Benchmarks (non-blocking)
+    continue-on-error: true # Non bloquant pour l'instant
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v3
+      - name: Install BioForge + Biopython
+        run: |
+          uv sync --frozen --all-extras
+          uv pip install -r benchmarks/requirements.txt
+      - name: Build Rust extension
+        run: uv run maturin develop
+      - name: Run benchmarks
+        run: uv run pytest benchmarks/ -v --benchmark-disable-gc

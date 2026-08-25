@@ -32,3 +32,6 @@ target-version = "py312"
 [tool.pyright]
 typeCheckingMode = "strict"
 pythonVersion = "3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -2,8 +2,8 @@
 
 Ce fichier permet à pyright de typer le module Rust compilé sans pouvoir
 l'introspecter directement. Il doit refléter fidèlement l'API exposée
-par `src/seq/dna.rs`, `src/seq/iupac.rs`, `src/seq/amino.rs` et
-`src/seq/standalone.rs`.
+par `src/seq/dna.rs`, `src/seq/iupac.rs`, `src/seq/amino.rs`,
+`src/seq/kmer.rs` et `src/seq/standalone.rs`.
 """
 
 from collections.abc import Iterator
@@ -19,15 +19,6 @@ class DnaSequence:
     Raises:
         ValueError: Si `seq` contient un caractère invalide.
 
-    Example:
-        >>> dna = DnaSequence("ATGC")
-        >>> len(dna)
-        4
-        >>> str(dna[1:3])
-        'TG'
-        >>> str(dna.reverse_complement())
-        'GCAT'
-
     Invariants:
         - len(self) == len(seq)
         - all(c in "ACGT" for c in str(self).upper())
@@ -42,35 +33,34 @@ class DnaSequence:
     @overload
     def __getitem__(self, index: slice) -> DnaSequence: ...
     def reverse_complement(self) -> DnaSequence: ...
+    def kmers(self, k: int) -> Iterator[DnaKmer]:
+        """Itère sur tous les k-mers de longueur k, de gauche à droite.
+
+        Args:
+            k: Longueur des k-mers. Doit être >= 1 et <= len(self).
+
+        Returns:
+            Iterator[DnaKmer]: Itérateur paresseux sur les k-mers.
+
+        Raises:
+            ValueError: Si k < 1 ou k > len(self).
+
+        Invariants:
+            - Nombre de k-mers == len(self) - k + 1
+            - Chaque k-mer a une longueur == k
+            - L'ordre est déterministe (gauche à droite)
+        """
+        ...
 
 class IupacSequence:
     """Séquence d'ADN avec ambiguïtés IUPAC encodée sur 4 bits.
 
     Préserve la totalité de l'information IUPAC (15 codes d'ambiguïté).
-    Aucune base ambiguë n'est dégradée en N.
-
-    Args:
-        seq: Chaîne de caractères représentant l'ADN avec ambiguïtés.
-            Alphabet accepté : A C G T N R Y S W K M B D H V
-            (casse ignorée).
-
-    Raises:
-        ValueError: Si `seq` contient un caractère hors de l'alphabet IUPAC.
-
-    Example:
-        >>> iupac = IupacSequence("ATGNRY")
-        >>> len(iupac)
-        6
-        >>> str(iupac)
-        'ATGNRY'
-        >>> str(iupac.reverse_complement())
-        'RYNCAT'
 
     Invariants:
         - len(self) == len(seq)
         - all(c in "ACGTNRYSWKMBDHV" for c in str(self).upper())
         - str(self.reverse_complement().reverse_complement()) == str(self).upper()
-        - Aucune perte d'information : decode(encode(seq)) == canonicalize(seq)
     """
 
     def __init__(self, seq: str) -> None: ...
@@ -85,33 +75,12 @@ class IupacSequence:
 class AminoSequence:
     """Séquence protéique encodée sur 6 bits par acide aminé.
 
-    Supporte les 20 acides aminés standards, les codes ambigus (B, J, Z),
-    les codes spéciaux (O, U, X) et le stop codon (*).
-
-    Args:
-        seq: Chaîne de caractères représentant une séquence protéique.
-            Alphabet accepté : A C D E F G H I K L M N P Q R S T V W Y B J Z O U X *
-            (casse ignorée, sauf pour * qui est un symbole littéral).
-
-    Raises:
-        ValueError: Si `seq` contient un caractère hors de l'alphabet protéique.
-
-    Example:
-        >>> protein = AminoSequence(
-            "MKTVRQERLKSIVRILERSKEPVSGAQLAEELSVSRQVIVQDIAYLRSLGYNIVATPRGYVLAGG"
-            )
-        >>> len(protein)
-        66
-        >>> protein[0]
-        'M'
-        >>> str(protein[0:10])
-        'MKTVRQERLK'
+    Supporte 27 symboles (20 AA standards + B/J/Z + O/U/X + *).
 
     Invariants:
         - len(self) == len(seq)
         - all(c in "ACDEFGHIKLMNPQRSTVWYBJZOUX*" for c in str(self).upper())
-        - Aucune opération de reverse_complement
-        - decode(encode(seq)) == canonicalize(seq)
+        - Pas de reverse_complement (protéines sans brin complémentaire)
     """
 
     def __init__(self, seq: str) -> None: ...
@@ -122,40 +91,16 @@ class AminoSequence:
     @overload
     def __getitem__(self, index: slice) -> AminoSequence: ...
 
-    # Note : Pas de méthode reverse_complement() pour les protéines.
-
 class DnaKmer:
     """Un k-mer d'ADN de longueur fixe, encodé de manière compacte.
 
-    Un k-mer est une sous-séquence d'ADN de longueur k. Le stockage est
-    compact (2 bits/base dans un registre u128), ce qui permet un hashing
-    parfait sans collision pour k <= 64.
-
-    Args:
-        seq: Chaîne de caractères représentant le k-mer. Doit contenir
-            uniquement A, C, G, T (casse ignorée). La longueur détermine k.
-            Doit être non-vide et <= 64.
-
-    Raises:
-        ValueError: Si `seq` est vide, si sa longueur dépasse 64, ou si
-            elle contient un caractère autre que A/C/G/T.
-
-    Example:
-        >>> kmer = DnaKmer("ATGC")
-        >>> len(kmer)
-        4
-        >>> str(kmer.reverse_complement())
-        'GCAT'
-        >>> kmer == DnaKmer("ATGC")
-        True
+    Stockage 2 bits/base dans un registre u128, hashing parfait pour k <= 64.
 
     Invariants:
         - len(self) == len(seq)
         - 1 <= len(self) <= 64
         - all(c in "ACGT" for c in str(self))
-        - hash(kmer) est stable, déterministe et sans collision pour k <= 64
         - (a == b) implique hash(a) == hash(b)
-        - canonical() retourne min(self, reverse_complement())
         - canonical() est idempotent
     """
 
@@ -170,90 +115,35 @@ class DnaKmer:
 def reverse_complement_strict(seq: str) -> str:
     """Retourne le complément inverse d'une séquence ADN stricte (A, C, G, T).
 
-    Version stricte qui rejette toute séquence contenant un caractère
-    autre que A, C, G, T (casse ignorée). Pour les séquences avec
-    ambiguïtés IUPAC (N, R, Y, etc.), utiliser `reverse_complement_ambiguous`.
-
     Args:
-        seq: Séquence ADN composée uniquement de A, C, G, T (insensible
-            à la casse).
+        seq: Séquence ADN composée uniquement de A, C, G, T.
 
     Returns:
-        str: La séquence complément inverse, toujours en majuscules.
+        str: La séquence complément inverse, en majuscules.
 
     Raises:
-        ValueError: Si `seq` contient un caractère autre que A/C/G/T
-            (y compris N et les codes IUPAC ambigus).
-
-    Example:
-        >>> reverse_complement_strict("ATGC")
-        'GCAT'
-        >>> reverse_complement_strict("atgc")  # casse ignorée
-        'GCAT'
+        ValueError: Si `seq` contient un caractère autre que A/C/G/T.
 
     Invariants:
         - len(output) == len(input)
-        - output est toujours en majuscules
         - reverse_complement_strict(reverse_complement_strict(s)) == s.upper()
-        - output ne contient que A/C/G/T
-        - "" → ""
     """
     ...
 
 def reverse_complement_ambiguous(seq: str) -> str:
     """Retourne le complément inverse d'une séquence ADN avec ambiguïtés IUPAC.
 
-    Version permissive qui accepte tous les codes IUPAC (A C G T N R Y S
-    W K M B D H V) et préserve l'information d'ambiguïté lors du complément.
-
-    Table de complément (involution) :
-        A↔T  C↔G  N↔N  R↔Y  S↔S  W↔W  K↔M  B↔V  D↔H
-
     Args:
-        seq: Séquence ADN avec ambiguïtés IUPAC (insensible à la casse).
-            Alphabet accepté : A C G T N R Y S W K M B D H V.
+        seq: Séquence ADN avec ambiguïtés IUPAC (A C G T N R Y S W K M B D H V).
 
     Returns:
-        str: La séquence complément inverse, toujours en majuscules,
-            avec les codes d'ambiguïté préservés.
+        str: La séquence complément inverse, en majuscules.
 
     Raises:
-        ValueError: Si `seq` contient un caractère hors de l'alphabet
-            IUPAC (ex: X, -, chiffres, etc.).
-
-    Example:
-        >>> reverse_complement_ambiguous("ATGNRY")
-        'RYNCAT'
+        ValueError: Si `seq` contient un caractère hors alphabet IUPAC.
 
     Invariants:
         - len(output) == len(input)
-        - output est toujours en majuscules
         - reverse_complement_ambiguous(reverse_complement_ambiguous(s)) == s.upper()
-        - Aucune perte d'information IUPAC
-        - "" → ""
     """
     ...
-
-    def kmers(self, k: int) -> Iterator[DnaKmer]:
-        """Itère sur tous les k-mers de longueur k, de gauche à droite.
-
-        Args:
-            k: Longueur des k-mers. Doit être >= 1 et <= len(self).
-
-        Returns:
-            Iterator[DnaKmer]: Itérateur paresseux sur les k-mers.
-
-        Raises:
-            ValueError: Si k < 1 ou k > len(self).
-
-        Example:
-            >>> seq = DnaSequence("ATGCA")
-            >>> [str(k) for k in seq.kmers(3)]
-            ['ATG', 'TGC', 'GCA']
-
-        Invariants:
-            - Nombre de k-mers == len(self) - k + 1
-            - Chaque k-mer a une longueur == k
-            - L'ordre est déterministe (gauche à droite)
-        """
-        ...
